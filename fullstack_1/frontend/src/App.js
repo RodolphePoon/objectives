@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Chart from 'react-google-charts';
 
 const OBJECTIVES = [
       { "id": 1, "title": "First objective", "start": 0, "target": 50, "current": 20, "start_date": "2018-01-05", "end_date": "2018-03-05" },
@@ -13,39 +12,46 @@ const OBJECTIVES = [
 
     const TODAY = "2018-02-20";
 
-    const result = OBJECTIVES.filter(objective => objective.current > objective.target)
+    class Button extends Component {
+      constructor(props) {
+        super(props);
+      
+        this.state = {i:0};
+      }
 
-    //const data =OBJECTIVES.map(e=>[{v:e.id.toString(),f:e.title},e.parent_id?e.parent_id.toString():""])
+      _onClick=()=>{
 
-    const data = [[
-        { type: 'string', label: 'Task ID' },
-        { type: 'string', label: 'Task Name' },
-        { type: 'date', label: 'Start Date' },
-        { type: 'date', label: 'End Date' },
-        { type: 'number', label: 'Duration' },
-        { type: 'number', label: 'Percent Complete' },
-        { type: 'string', label: 'Dependencies' }
-        ],
-        ...OBJECTIVES.map(e=>[e.id.toString(),e.title,new Date(e.start_date),new Date(e.end_date),new Date(e.end_date)-new Date(e.start_date),100*(e.current-e.start)/Math.abs(e.target-e.start),e.parent_id?e.parent_id.toString():""])
-      ]
-    
+        this.setState({i:this.state.i+1})
+        this.props.onClick()
+
+      }
+      render(){
+        return(
+          <button onClick={this._onClick} >nb press {this.state.i}</button>)
+      }
+    }
 
 class App extends Component {
 
+  constructor(props) {
+    super(props);
+  
+    this.state = {
+      objectives:OBJECTIVES
+    };
+  }
+
+  _onClick=(index)=>{
+    let objectives = this.state.objectives
+    objectives[index].current+=1
+    this.setState({ objectives})
+  }
 
 
   render() {
     return (
      <div>
-      <div>{result.length} objectives have their current value over their target</div>
-    
-    <Chart
-  width={'100%'}
-  height={'500px'}
-  chartType="Gantt"//OrgChart/Gantt
-  loader={<div>Loading Chart</div>}
-  data={data}
-/>
+      {this.state.objectives.map((e,index)=><div key={index}>{e.title} {e.current} <Button onClick={()=>this._onClick(index)}/> </div>)}
     </div>
     );
   }
